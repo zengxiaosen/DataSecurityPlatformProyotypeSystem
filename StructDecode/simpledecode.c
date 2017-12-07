@@ -132,10 +132,82 @@ int Teacher_Decode(unsigned char *p, int len, Teacher **pstruct){
 
 	DER_ITCAST_FreeQueue(inAnyBuf);
 	pTmp = pHead;
-	pTmpStru
+	pTmpStru = (Teacher *)malloc(sizeof(Teacher));
+	if(pTmpStru == NULL){
+		DER_ITCAST_FreeQueue(pHead);
+		ret = 3;
+		printf("func Teacher_Decode() err: %d. malloc err \n", ret);
+		return ret;
+	}
+	memset(pTmpStru, 0, sizeof(Teacher));
 
+	//decode name
+	ret = DER_ItAsn1_ReadPrintableString(pTmp, &pTmpDABuf);
+	if(ret != 0){
+		DER_ITCAST_FreeQueue(pHead);
+		printf("func DER_ItAsn1_ReadPrintableString() err:%d \n", ret);
+		return ret;
+	}
+	strncpy(pTmpStru->name, pTmpDABuf->pData, pTmpDABuf->dataLen);
+	pTmp = pTmp->next;
+	DER_ITCAST_FreeQueue(pTmpDABuf);
+
+	//decode age
+	ret = DER_ItAsn1_ReadInteger(pTmp, &pTmpStru->age);
+	if(ret != 0){
+		DER_ITCAST_FreeQueue(pHead);
+		printf("func DER_ItAsn1_ReadInteger() err:%d \n", ret);
+		return ret;
+	}
+	pTmp = pTmp->next;
+
+	//decode p
+	ret = DER_ItAsn1_ReadPrintableString(pTmp, &pTmpDABuf)
+	if(ret != 0){
+		printf("func DER_ItAsn1_ReadPrintableString() err:%d \n", ret);
+		return ret;
+	}
+
+	pTmpStru->p = (unsigned char *)malloc(pTmpDABuf->dataLen + 1);
+	if(pTmpStru->p == NULL){
+		DER_ITCAST_FreeQueue(pTmpDABuf);
+		DER_ITCAST_FreeQueue(pHead);
+		ret = 4;
+		printf("func Teacher_Decode() err: %d. malloc err \n", ret);
+		return ret;
+	}
+
+	memcpy(pTmpStru->p, pTmpDABuf->pData, pTmpDABuf->dataLen);
+	pTmpStru->p[pTmpDABuf->dataLen] = '\0';
+	pTmp = pTmp->next;
+	DER_ITCAST_FreeQueue(pTmpDABuf);
+
+	//decode plen
+	ret = DER_ItAsn1_ReadInteger(pTmp, &pTmpStru->plen);
+	if(ret != 0){
+		DER_ITCAST_FreeQueue(pHead);
+		printf("func DER_ItAsn1_ReadInteger() err:%d \n", ret);
+		return ret;
+	}
+
+	*pstruct = pTmpStru;
+	DER_ITCAST_FreeQueue(pHead);
+	return ret;
 
 }
+
+//first level zhizhen
+void Teacher_Free(Teacher *pStruct){
+	if(pStruct == NULL){
+		return;
+	}
+	if(pStruct->p){
+		free(pStruct->p);
+	}
+	free(pStruct);
+}
+
+
 
 int main(){
 	int ret = 0;
