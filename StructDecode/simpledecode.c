@@ -96,7 +96,15 @@ int Teacher_Encode(Teacher *pstruct, unsigned char **p, int *len){
 }
 
 int Teacher_Decode(unsigned char *p, int len, Teacher **pstruct){
-	return 0;
+	int ret = 0;
+	ITCAST_ANYBUF *pTmp = NULL, *pHead = NULL;
+	ITCAST_ANYBUF *pTmpDABuf = NULL;
+	ITCAST_ANYBUF *pOutData = NULL;
+	ITCAST_ANYBUF *inAnyBuf = NULL;
+	int tmpNum = 0;
+	Teacher *pTmpStru = NULL;
+
+	
 }
 
 int main(){
