@@ -104,7 +104,37 @@ int Teacher_Decode(unsigned char *p, int len, Teacher **pstruct){
 	int tmpNum = 0;
 	Teacher *pTmpStru = NULL;
 
-	
+	//*pTmpStru = (Teacher *)malloc(sizeof(Teacher));
+	inAnyBuf = (ITCAST_ANYBUF *)malloc(sizeof(ITCAST_ANYBUF));
+	if(inAnyBuf == NULL){
+		ret = 1;
+		printf("func Teacher_Decode() err: %d. malloc err \n", ret);
+		return ret;
+	}
+
+	memset(inAnyBuf, 0, sizeof(ITCAST_ANYBUF)); // fuzhi 
+	inAnyBuf->pData = (unsigned char *)malloc(len);
+	if(inAnyBuf->pData == NULL){
+		ret = 2;
+		DER_ITCAST_FreeQueue(inAnyBuf);
+		printf("func Teacher_Decode() err: %d. malloc err \n", ret);
+		return ret;
+	}
+	inAnyBuf->dataLen = len;
+	memcpy(inAnyBuf->pData, p, len);
+
+	ret = DER_ItAsn1_ReadSequence(inAnyBuf, &pHead);
+	if(ret != 0){
+		DER_ITCAST_FreeQueue(inAnyBuf);
+		printf("func DER_ItAsn1_ReadSequence() err:%d \n", ret);
+		return ret;
+	}
+
+	DER_ITCAST_FreeQueue(inAnyBuf);
+	pTmp = pHead;
+	pTmpStru
+
+
 }
 
 int main(){
