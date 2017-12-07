@@ -6,10 +6,13 @@
 int main(){
 	int ret = 0;
 	Teacher t1;
+
 	unsigned char *out = NULL;
 	int outlen = 0;
+
 	Teacher *outPstruct = NULL;
 	int iType = 0;
+
 	memset(&t1, 0, sizeof(Teacher));
 	strcpy(t1.name, "myname");
 	t1.age = 32;
@@ -19,6 +22,18 @@ int main(){
 
 	ret = MsgEncode((void *)&t1, ID_MsgType_Teacher, &out, &outlen);
 	if(ret != 0){
-		
+		printf("func MsgEncode() err:%d\n", ret);
+		return ret;
 	}
+
+	ret = MsgDecode(out, outlen, &outPstruct, &iType);
+	if(ret != 0){
+		printf("func MsgDecode() err:%d \n", ret);
+		return ret;
+	}
+
+	MsgMemFree((void **)&out, 0);
+	MsgMemFree((void **)&outPstruct, iType);
+	printf("hello...\n");
+	return 0;
 }
