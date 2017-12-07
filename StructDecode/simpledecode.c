@@ -207,6 +207,24 @@ void Teacher_Free(Teacher *pStruct){
 	free(pStruct);
 }
 
+void Teacher_Free2(Teacher **pStruct){
+	Teacher *tmp = NULL;
+	if(pStruct == NULL){
+		return;
+	}
+	tmp = *pStruct;
+	if(tmp == NULL){
+		return;
+	}
+	if(tmp->p){
+		free(tmp->p);
+	}
+	free(tmp);
+	*pStruct = NULL;
+}
+
+
+
 
 
 int main(){
@@ -242,6 +260,12 @@ int main(){
 	}else{
 		printf("the encode data is same with the decode data! \n");
 	}
+
+	Teacher_Free2(&outPstruct);
+	Teacher_Free2(&outPstruct);
+	Teacher_Free2(&outPstruct);
+	printf("hello...\n");
+	
 
 
 
