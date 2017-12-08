@@ -14,6 +14,32 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
+void main41(){
+	int shmid;
+	shmid = shmget(0x3334, 128, 0666);
+	if(shmid < 0){
+		printf("get share memory error! \n");
+		return;
+	}else{
+		printf("get share memory succeed! \n");
+	}
+	
+
+
+	printf("hello\n");
+}
+
 void main(){
+	int shmid;
+	shmid = shmget(0x3334, 128, 0666 | IPC_CREAT);
+	if(shmid < 0){
+		printf("get share memory error! \n");
+		return;
+	}else{
+		printf("get share memory succeed! \n");
+	}
+	
+
+
 	printf("hello\n");
 }
