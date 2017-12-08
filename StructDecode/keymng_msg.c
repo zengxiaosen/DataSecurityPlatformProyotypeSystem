@@ -9,6 +9,11 @@ int MsgEncode(
 	unsigned char	**outData, /*out*/
 	int				*outLen)
 {
+	// itype tlv
+
+	//teacher tlv sequence
+
+	//all sequence tlv
 	return 0;
 }
 
