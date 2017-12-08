@@ -8,7 +8,7 @@
 int mywritefile(unsigned char *buf, int len)
 {
 	FILE *fp = NULL;
-	fp = fopen("/home/zengxiaosen/DataSecurityPlatform/mymsgrealtest/teacher.ber", "wb+");
+	fp = fopen("c:/teacher.ber", "wb+");
 	if (fp == NULL)
 	{
 		printf("fopen file error \n");

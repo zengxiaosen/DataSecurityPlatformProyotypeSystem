@@ -6,7 +6,7 @@ all: testmsgreal
 
 
 CC	= gcc
-#HOME=/home/zengxiaosen/DataSecurityPlatform
+
 
 WORKDIR=.
 LIBDIR=$(HOME)/lib

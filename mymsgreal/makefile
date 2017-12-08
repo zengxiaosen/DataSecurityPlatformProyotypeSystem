@@ -18,7 +18,7 @@ LIBS =
 VPATH = $(WORKDIR)/src
 
 
-OBJ7 = itcast_asn1_der.o  itcastderlog.o  mykeymng_msg.o
+OBJ7 = itcast_asn1_der.o  itcastderlog.o  keymng_msg.o
 
 #当有一个.c发生更新的时, 目标重新生成吗?
 
