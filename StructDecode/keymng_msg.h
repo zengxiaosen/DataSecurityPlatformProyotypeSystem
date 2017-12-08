@@ -1,6 +1,7 @@
+//make sure that .h be compiled once
 #ifndef _KEYMNG_MSG_H_
 #define _KEYMNG_MSG_H_
-
+//if your compiler is for c++ , please use c
 #ifdef __cplusplus
 extern "C" {
 #endif
