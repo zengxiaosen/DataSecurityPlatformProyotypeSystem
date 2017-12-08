@@ -31,7 +31,7 @@ void main41(){
 
 void main(){
 	int shmid;
-	shmid = shmget(0x3334, 128, 0666 | IPC_CREAT);
+	shmid = shmget(0x3334, 128, 0666 |IPC_CREAT );
 	if(shmid < 0){
 		printf("get share memory error! \n");
 		return;
@@ -39,7 +39,19 @@ void main(){
 		printf("get share memory succeed! \n");
 	}
 	
-
-
 	printf("hello\n");
+
+	// link the shared memory
+	char * p = shmat(shmid, NULL, 0);
+	strcpy(p, "12345678");
+	printf("p:%s \n", (char *)p);
+
+	//drop the link of shared memory
+	shmdt((void *)p);
+
+	getchar();
+
+	//shut the shared memory
+	shmctl(shmid, IPC_RMID, NULL);
+
 }
