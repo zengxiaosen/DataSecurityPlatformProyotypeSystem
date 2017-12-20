@@ -15,6 +15,7 @@
 #include "poolsocket.h"
 #include "keymnglog.h"
 #include "keymngclientop.h"
+#include "keymng_shmop.h"
 //#include "keymng_shmop.h"
 
 int MngClient_InitInfo(MngClient_Info *pCltInfo)
@@ -28,6 +29,9 @@ int MngClient_InitInfo(MngClient_Info *pCltInfo)
 	pCltInfo->maxnode = 8001;
 	pCltInfo->shmkey = 0x1111;
 	pCltInfo->shmhdl = 0;
+
+	//客户端共享内存 初始化
+	KeyMng_ShmInit(pCltInfo->shmkey, )
 	
 	printf("读配置文件ok\n");
 

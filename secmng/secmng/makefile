@@ -14,13 +14,13 @@ BIN = keymngclient  keymngserver
 all:$(BIN)
 
 #  myipc_shm.o  keymng_shmop.o keymng_dbop.o
-keymngserver:keymngserver.o  keymngserverop.o  keymnglog.o
+keymngserver:keymngserver.o  keymngserverop.o  keymnglog.o myipc_shm.o keymng_shmop.o
 	$(CC) $(LIBFLAG) $^ -o $@ -lpthread -litcastsocket -lmessagereal  -lclntsh  -licdbapi
 
 
 
 #myipc_shm.o keymng_shmop.o
-keymngclient:keymngclient.o  keymnglog.o keymngclientop.o
+keymngclient:keymngclient.o  keymnglog.o keymngclientop.o myipc_shm.o keymng_shmop.o
 	$(CC) $(LIBFLAG) -lpthread -litcastsocket -lmessagereal $^ -o $@ 
 
 
