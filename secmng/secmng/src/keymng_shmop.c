@@ -18,5 +18,41 @@
 
 int KeyMng_ShmInit(int key, int maxnodenum, int *shmhdl){
     int ret = 0;
-    return 0;
+    int tmpshmhdl;
+    void *mapaddr = NULL;
+    ret = IPC_OpenShm(key, maxnodenum, &tmpshmhdl);
+    //若共享内存不存在
+    if(ret == MYIPC_NotEXISTErr){
+        printf("系统检测到没有共享内存，开始创建共享内存");
+        //创建共享内存
+        ret = IPC_CreatShm(key, maxnodenum*sizeof(NodeSHMInfo), &tmpshmhdl);
+        if(ret != 0){
+            printf("创建共享那日村失败\n");
+            goto End;
+        }
+        //创建共享内存成功，则链接共享内存
+        ret = IPC_MapShm(tmpshmhdl, &mapaddr);
+        if(ret != 0){
+            printf("链接共享内存失败\n");
+            goto End;
+        }
+
+        //清除共享内存
+        memset(mapaddr, 0, maxnode*sizeof(NodeSHMInfo));
+        IPC_UnMapShm(mapaddr);
+
+    }
+    else if (ret == 0){
+        printf("系统检测到共享内存存在\n");
+        *shmhdl = tmpshmhdl;
+    }
+    else{
+        printf("系统 IPC_OpenShm() 失败:%d\n", ret);
+    }
+
+    
+
+
+End:
+    return ret;
 }

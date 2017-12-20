@@ -92,8 +92,7 @@ int IPC_CreatShmBySeedName(char *shmseedfile, int shmsize, int *shmhdl)
                 mapaddr [out] 共享内存首地址
   返回值：      返回0函数执行成功；非0返回错误码
 ************************************************************************/
-int
-IPC_MapShm(int  shmhdl, void  **mapaddr)
+int IPC_MapShm(int  shmhdl, void  **mapaddr)
 {
     void *tempptr = NULL;
 

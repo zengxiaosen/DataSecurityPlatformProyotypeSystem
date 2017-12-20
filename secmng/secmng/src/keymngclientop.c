@@ -20,6 +20,8 @@
 
 int MngClient_InitInfo(MngClient_Info *pCltInfo)
 {
+	int ret = 0;
+
 	strcpy(pCltInfo->clientId, "1111");
 	strcpy(pCltInfo->AuthCode, "1111");
 	strcpy(pCltInfo->serverId, "0001");
@@ -30,8 +32,30 @@ int MngClient_InitInfo(MngClient_Info *pCltInfo)
 	pCltInfo->shmkey = 0x1111;
 	pCltInfo->shmhdl = 0;
 
+	/*
+		typedef struct _MngClient_Info
+		{
+			char			clientId[12];	//客户端编号
+			char			AuthCode[16];	//认证码
+			char			serverId[12];	//服务器端编号
+			
+			char			serverip[32];
+			int 			serverport;
+			
+			int				maxnode; //最大网点数 客户端默认1个
+			int 			shmkey;	 //共享内存keyid 创建共享内存时使用	 
+			int 			shmhdl; //共享内存句柄	
+		}MngClient_Info;
+	*/
+
 	//客户端共享内存 初始化
-	KeyMng_ShmInit(pCltInfo->shmkey, )
+	ret = KeyMng_ShmInit(pCltInfo->shmkey, pCltInfo->maxnode, &(pCltInfo->shmhdl));
+	if(ret != 0){
+		printf("func KeyMng_ShmInit() err:%d \n", ret);
+		return ret;
+	}
+	
+
 	
 	printf("读配置文件ok\n");
 
