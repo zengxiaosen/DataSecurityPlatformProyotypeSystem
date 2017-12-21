@@ -56,3 +56,90 @@ int KeyMng_ShmInit(int key, int maxnodenum, int *shmhdl){
 End:
     return ret;
 }
+
+//写共享内存节点
+// 1 若共享内存节点已经存在，则修改
+// 2 若共享内存不存在，则找空位置插入
+int KeyMng_ShmWrite(int shmhdl, int maxnodenum, NodeSHMInfo *pNodeInfo){
+    int ret = 0, i = 0;
+    NodeSHMInfo tmpNodeInfo;
+    NodeSHMInfo *pNode = NULL;
+    void *mapaddr = NULL;
+
+    //链接共享内存
+    ret = IPC_MapShm(shmhdl, &mapaddr);
+    if(ret != 0){
+        KeyMng_Log(__FILE__, __LINE__, KeyMngLevel[4], ret, "IPC_MapShm() Err");
+        goto End;
+    }
+
+    //判断共享内存节点是否已经存在，若存在则修改
+    for(i=0; i< maxnode; i++){
+        pNode = (NodeSHMInfo *)( mapaddr + i*sizeof(NodeSHMInfo));
+        if(memcpy(pNode, &tmpNodeInfo, sizeof(NodeSHMInfo)) != 0){
+            if(strcmp(pNode->clientId, pNodeInfo->clientId) == 0 && strcmp(pNode->serverId, pNodeInfo->serverId) == 0){
+                KeyMng_Log(__FILE__, __LINE__, KeyMngLevel[3], ret, "系统检测到有旧的节点信息");
+                memcpy(pNode, pNodeInfo, sizeof(NodeSHMInfo));
+                goto End;
+            }
+        }
+    }
+
+    //遍历节点数组，找个空位置插入
+    for(i=0; i< maxnodenum; i++){
+        pNode = (NodeSHMInfo *)(mapaddr + i*sizeof(NodeSHMInfo));
+        if(memcpy(pNode, &tmpNodeInfo, sizeof(NodeSHMInfo)) == 0){
+            KeyMng_Log(__FILE__, __LINE__, KeyMngLevel[3], ret, "系统检测到有空节点信息");
+            memcpy(pNode, pNodeInfo, sizeof(NodeSHMInfo));
+            goto End;
+        }
+    }
+
+    if(i == maxnodenum){
+        ret = 33;
+        KeyMng_Log(__FILE__, __LINE__, KeyMngLevel[4], ret, "系统检测到共享内存节点已满 错误");
+        goto End;
+    }
+
+End:
+    KeyMng_Log(__FILE__, __LINE__, KeyMngLevel[2], ret, "KeyMng_ShmWrite() ddddddddddddddddddddd");
+    IPC_UnMapShm(mapaddr);
+    return ret;
+}
+
+//读共享内存
+int KeyMng_ShmRead(int shmhdl, char *clientId, char *serverId, int maxnodenum, NodeSHMInfo *pNodeInfo){
+    int ret = 0, i = 0;
+    NodeSHMInfo tmpNodeInfo;
+    NodeSHMInfo *pNode = NULL;
+    void *mapaddr = NULL;
+
+    memset(&tmpNodeInfo, 0, sizeof(NodeSHMInfo));
+
+    //链接共享内存
+    ret = IPC_MapShm(shmhdl, &mapaddr);
+    if(ret != 0){
+        KeyMng_Log(__FILE__, __LINE__, KeyMngLevel[4], ret, "IPC_MapShm() Err");
+        goto End;
+    }
+
+    //判断 共享内存节点已存在 则修改
+    for(i=0; i< maxnodenum; i++){
+        pNode = (NodeSHMInfo *)( mappaddr + i*sizeof(NodeSHMInfo) );
+        if( strcmp(pNode->clientId, clientId) == 0 && strcmp(pNode->serverId, serverId) == 0){
+            KeyMng_Log(__FILE__, __LINE__, KeyMngLevel[3], ret, "系统检测到有旧的节点信息");
+            memcpy(pNodeInfo, pNode, sizeof(NodeSHMInfo));
+            goto End;
+        }
+    }
+
+    if(i ==  maxnodenum){
+        ret = 33;
+        KeyMng_Log(__FILE__, __LINE__, KeyMngLevel[4], ret, "系统恶密友找到符合条件的共享内存节点clientId:%s, serverId:%s", clientId, serverId);
+        goto End;
+    }
+
+End:
+    IPC_UnMapShm(mapaddr);
+    return ret;
+}
