@@ -11,10 +11,10 @@
 #include "keymng_msg.h"
 #include "myipc_shm.h"
 
-//#include "keymng_shmop.h"
+#include "keymng_shmop.h"
 
 #include "icdbapi.h"
-//#include "keymng_dbop.h"
+#include "keymng_dbop.h"
 
 
 //初始化服务器 全局变量
@@ -81,6 +81,27 @@ int MngServer_Agree(MngServer_Info *svrInfo, MsgKey_Req *msgkeyReq, unsigned cha
 		goto End;		
 	}
 	
+
+	//获取链接
+	ret = IC_DBApi_ConnGet(&handle, 0, 0 );
+	if(ret !=  0){
+		KeyMng_Log(__FILE__, __LINE__, KeyMngLevel[4], ret, "func IC_DBApi_ConnGet() err");
+		return ret;
+	}
+
+	ret = IC_DBApi_BeginTran(handle);
+	if(ret !=  0){
+		KeyMng_Log(__FILE__, __LINE__, KeyMngLevel[4], ret, "func IC_DBApi_BeginTran() err");
+		goto End;
+	}
+
+	//从数据库中获取密钥sn
+	ret = KeyMngsvr_DBOp_GenKeyID(handle, &tmpkeysn);
+	if(ret != 0){
+		KeyMng_Log(__FILE__, __LINE__, KeyMngLevel[4], ret, "func KeyMngsvr_DBOp_GenKeyID() err");
+		goto End;
+	}
+
 	//服务器端 组织应答报文
 	msgKeyRes.rv = 0;
 	strcpy(msgKeyRes.clientId, msgkeyReq-> clientId);	//客户端编号
@@ -90,7 +111,8 @@ int MngServer_Agree(MngServer_Info *svrInfo, MsgKey_Req *msgkeyReq, unsigned cha
 	{
 		msgKeyRes.r2[i] = 'a' + i;
 	}
-	msgKeyRes.seckeyid = 99;//应该从数据库中获取递增序列号
+	msgKeyRes.seckeyid = tmpkeysn;
+	//msgKeyRes.seckeyid = 99;//应该从数据库中获取递增序列号
 	ret = MsgEncode(&msgKeyRes, ID_MsgKey_Res,  outData, datalen);
 	if (ret != 0)
 	{
@@ -127,7 +149,16 @@ int MngServer_Agree(MngServer_Info *svrInfo, MsgKey_Req *msgkeyReq, unsigned cha
 		goto End;
 	}
 	//写数据库
-
+	ret = KeyMngsvr_DBOp_WriteSecKey(handle, &nodeShmInfo);
+	if(ret != 0){
+		KeyMng_Log(__FILE__, __LINE__, KeyMngLevel[4], ret, "func KeyMngsvr_DBOp_WriteSecKey() err");
+		goto End;
+	}
+	if(ret == 0){
+		IC_DBApi_Commit(handle);
+	}else{
+		IC_DBApi_Rollback(handle);
+	}
 
 
 End:
@@ -172,7 +203,8 @@ int MngServer_Check(MngServer_Info *svrInfo, MsgKey_Req *msgkeyReq, unsigned cha
 	}else{
 		msgKeyRes.rv = 35;
 	}
-	msgKeyRes.seckeyid = 909;//应该从数据库中获取，递增序列号
+	//msgKeyRes.seckeyid = 909;//应该从数据库中获取，递增序列号
+	msgKeyRes.seckeyid = nodeShmInfo.keyid;
 	ret = MsgEncode(&msgKeyRes, ID_MsgKey_Res, outData, dataLen);
 
 	if(ret != 0){
