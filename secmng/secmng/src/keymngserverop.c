@@ -204,7 +204,7 @@ int MngServer_Check(MngServer_Info *svrInfo, MsgKey_Req *msgkeyReq, unsigned cha
 		msgKeyRes.rv = 35;
 	}
 	//msgKeyRes.seckeyid = 909;//应该从数据库中获取，递增序列号
-	msgKeyRes.seckeyid = nodeShmInfo.keyid;
+	msgKeyRes.seckeyid = nodeShmInfo.seckeyid;
 	ret = MsgEncode(&msgKeyRes, ID_MsgKey_Res, outData, dataLen);
 
 	if(ret != 0){
@@ -212,7 +212,6 @@ int MngServer_Check(MngServer_Info *svrInfo, MsgKey_Req *msgkeyReq, unsigned cha
 		goto End;
 	}
 
-	//写数据库
 End:
 	KeyMng_Log(__FILE__, __LINE__, KeyMngLevel[4], ret, "func MngServer_Check() End");
 	return ret;
