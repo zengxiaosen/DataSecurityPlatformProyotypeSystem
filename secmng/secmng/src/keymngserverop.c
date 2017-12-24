@@ -44,6 +44,15 @@ int MngServer_InitInfo(MngServer_Info *svrInfo)
 		ret = 33;
 		printf("seckeyserver系统初始化共享内存失败\n");
 	}
+
+	//初始化数据库连接池
+	ret = IC_DBApi_PoolInit(svrInfo->dbpoolnum, svrInfo->dbsid, svrInfo->dbuse, svrInfo->dbpasswd);
+	if(ret != 0){
+		printf("func IC_DBApi_PoolInit() err:%d \n", ret);
+		return ret;
+	}
+	printf("初始化链接数据库 ok \n");
+	
 	
 	return ret;
 }
