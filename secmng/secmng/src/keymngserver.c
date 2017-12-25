@@ -144,7 +144,29 @@ void *(mystart_routine) (void *arg)
 	printf("func mystart_routine() End\n");
 	return NULL;
 } 
+//创建守护进程
+//把父进程干掉，然后让子进程去执行 setsid
+//孩子又创建一个孙子进程，然后又把孩子进程干掉，只留下孙子进程
+/*
+孙子进程不再具有连接前端会话器的能力。但孩子还是具有链接前台的能力
+*/
+#define INIT_DAEMON \
+{ \
+	if(fork() > 0) exit(0); \
+	setsid(); \
+	if(fork() > 0) exit(0); \
+}
 
+int EndTag = 0;
+
+
+int mainx(){
+	fork();
+	fork();
+	fork();
+	printf("aaa\n");
+	//一共print8次
+}
 
 int main()
 {

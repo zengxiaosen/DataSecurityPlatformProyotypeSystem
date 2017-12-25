@@ -14,7 +14,7 @@ BIN = keymngclient  keymngserver
 all:$(BIN)
 
 #  myipc_shm.o  keymng_shmop.o keymng_dbop.o
-keymngserver:keymngserver.o  keymngserverop.o  keymnglog.o myipc_shm.o keymng_shmop.o
+keymngserver:keymngserver.o  keymngserverop.o  keymnglog.o myipc_shm.o keymng_shmop.o keymng_dbop.o
 	$(CC) $(LIBFLAG) $^ -o $@ -lpthread -litcastsocket -lmessagereal  -lclntsh  -licdbapi
 
 
