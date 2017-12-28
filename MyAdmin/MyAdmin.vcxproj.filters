@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MyAdmin.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyAdminDoc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyAdminView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GFXGROUPEDIT.H">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GFXOUTBARCTRL.H">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GFXPOPUPMENU.H">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="gfxPub.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GFXSPLITTERWND.H">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FormBackground.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CfgView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgNetInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SysAll.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgTab1.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgTab2.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgTab3.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TabSheet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="cfg_op.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="secmng_globvar.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgInitCfg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MyAdmin.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MyAdminDoc.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MyAdminView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GFXGROUPEDIT.CPP">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GFXOUTBARCTRL.CPP">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GFXPOPUPMENU.CPP">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GFXSPLITTERWND.CPP">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FormBackground.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CfgView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgNetInfo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SysAll.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgTab1.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgTab2.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgTab3.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TabSheet.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cfg_op.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgInitCfg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MyAdmin.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\MyAdmin.rc2">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\dragging.cur">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\handlecur.cur">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\nodragging.cur">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\MyAdminDoc.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\MyAdmin.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\Toolbar.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\log.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\op_log.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\re.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\report.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\req.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\set.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\user.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\background.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

@@ -14,7 +14,9 @@
 #include "keymngserverop.h"
 #include "poolsocket.h"
 #include "keymng_msg.h"
+#include "icdbapi.h"
 
+int g_EndTag = 0;
 
 MngServer_Info			mngserverInfo;
 
@@ -40,6 +42,9 @@ void *(mystart_routine) (void *arg)
 	int  connfd = (int)arg;
 	while (1)
 	{
+		if(g_EndTag == 1){
+			break;
+		}
 		//服务器端端  接受报文
 		ret = sckServer_rev(connfd,  timeout, &out, &outlen); //1 //mem real
 		if (ret == Sck_ErrTimeOut)
@@ -149,6 +154,7 @@ void *(mystart_routine) (void *arg)
 //孩子又创建一个孙子进程，然后又把孩子进程干掉，只留下孙子进程
 /*
 孙子进程不再具有连接前端会话器的能力。但孩子还是具有链接前台的能力
+
 */
 #define INIT_DAEMON \
 { \
@@ -168,6 +174,16 @@ int mainx(){
 	//一共print8次
 }
 
+void mysighandler_t(int arg){
+	g_EndTag = 1;
+	printf("系统收到信号\n");
+}
+
+//函数指针做函数参数
+//1 看到含所有 函数指针做函数参数的api函数，它的意思是说：谁调用我，谁提供函数的入口地址
+//2 意思： 以前人写的框架，能调用后来人写的代码--》可扩展c++多态
+		// 任务的编写者 和任务的调用者进行解耦合
+
 int main()
 {
 	int 		ret = 0;
@@ -179,7 +195,9 @@ int main()
 	
 	//对全局变量初始化
 	memset(&mngserverInfo, 0, sizeof(MngServer_Info));
-	
+	signal(SIGUSR1, mysighandler_t); // 告诉linux内核，如何处理信号 （安装信号的处理函数，供条件满足时，被linux内核调用）
+
+	INIT_DAEMON;
 	
 	//服务器端 配置参数 初始化
 	ret = MngServer_InitInfo(&mngserverInfo);
@@ -216,12 +234,15 @@ int main()
 	 	pthread_create(&pid,NULL,mystart_routine, (void *)connfd);		
 		
 	}
+	sleep(1);
 
 	sckServer_close(listenfd);
 	//服务器端环境释放 
 	sckServer_destroy();
- 
-	printf("hello...\n");	
+
+	//释放数据库链接池
+	IC_DBApi_PoolFree();
+	printf("系统收到信号后，安全退出...\n");	
 	return 0;
 }
 
