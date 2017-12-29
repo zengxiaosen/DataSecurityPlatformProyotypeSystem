@@ -12,7 +12,7 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_QML_DEBUG -DQT_CORE_LIB
+DEFINES       = -DTEST_LAMBDA -DQT_QML_DEBUG -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I../cplusplus11test -I. -I/opt/Qt5.7.0/5.7/gcc_64/include -I/opt/Qt5.7.0/5.7/gcc_64/include/QtCore -I. -I/opt/Qt5.7.0/5.7/gcc_64/mkspecs/linux-g++
@@ -638,7 +638,8 @@ main.o: ../cplusplus11test/main.cpp /opt/Qt5.7.0/5.7/gcc_64/include/QtCore/QCore
 		/opt/Qt5.7.0/5.7/gcc_64/include/QtCore/qset.h \
 		/opt/Qt5.7.0/5.7/gcc_64/include/QtCore/qcontiguouscache.h \
 		/opt/Qt5.7.0/5.7/gcc_64/include/QtCore/qsharedpointer.h \
-		/opt/Qt5.7.0/5.7/gcc_64/include/QtCore/qsharedpointer_impl.h
+		/opt/Qt5.7.0/5.7/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		/opt/Qt5.7.0/5.7/gcc_64/include/QtCore/QVector
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../cplusplus11test/main.cpp
 
 ####### Install

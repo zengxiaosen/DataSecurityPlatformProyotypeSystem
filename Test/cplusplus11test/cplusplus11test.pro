@@ -7,6 +7,10 @@ TARGET = cplusplus11test
 CONFIG += console
 CONFIG -= app_bundle
 
+# DEFINES += TEST_OVERRIDE_FINAL
+#DEFINES += TEST_AUTO_DECLTYPE
+#DEFINES += TEST_FOR
+DEFINES += TEST_LAMBDA
 TEMPLATE = app
 
 SOURCES += main.cpp
