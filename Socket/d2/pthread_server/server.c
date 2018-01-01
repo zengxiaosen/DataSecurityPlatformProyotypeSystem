@@ -15,10 +15,12 @@
 
 void *do_work(void *arg)
 {
+    //每个线程定义自己的buffer ， 因为都会看到主线程的buf， 会混乱。。
     char buf[1024];
     int len, i;
     int cfd = (int)arg;
-
+    //把线程搞成游离态
+    //pthread_self()获取线程自己的pid
     pthread_detach(pthread_self());
 
     while (1) {

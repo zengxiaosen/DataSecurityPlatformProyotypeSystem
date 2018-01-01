@@ -1,7 +1,7 @@
 #ifndef __WRAP_H_
 #define __WRAP_H_
 
-void perr_exit(const char *s)
+void perr_exit(const char *s);
 int Accept(int fd, struct sockaddr *sa, socklen_t *salenptr);
 void Bind(int fd, const struct sockaddr *sa, socklen_t salen);
 void Connect(int fd, const struct sockaddr *sa, socklen_t salen);
@@ -13,8 +13,6 @@ void Close(int fd);
 ssize_t Readn(int fd, void *vptr, size_t n);
 ssize_t Writen(int fd, const void *vptr, size_t n);
 static ssize_t my_read(int fd, char *ptr);
-ssize_t Readline
-
-
+ssize_t Readline(int fd, void *vptr, size_t maxlen);
 
 #endif

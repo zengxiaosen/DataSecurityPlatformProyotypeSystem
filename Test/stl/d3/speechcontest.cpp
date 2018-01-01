@@ -44,6 +44,41 @@ void Random_SpeakerID(vector<int>& v1){
 //选手比赛
 void Match_Speaker(int index, vector<int>& v1, map<int, Speaker>& mapSpeaker, vector<int>& v2){
     multimap<int, int, greater<int>> mapGroup;
+    int indexTemp = 0;
+    int indexGroup = 0;
+    for(vector<int>::iterator it = v1.begin(); it != v1.end(); it++){
+        indexTemp ++;
+        deque<int> dscore; //保存评委10次得分
+        for(int i=0; i< 10; i++){
+            int score = 50 + rand() % 50;
+            dscore.push_back(score);
+        }
+        //排序
+        sort(dscore.begin(), dscore.end()); //从小到大排序
+        //去除最高分，去除最低分
+        dscore.pop_back();//去除最高分
+        dscore.pop_front();//去除最低分
+
+        int totalscore = accumulate(dscore.begin(), dscore.end(), 0);
+        int scoreavg = totalscore / dscore.size();
+
+        mapSpeaker[*it].score[index - 1] = scoreavg; //保存当前参赛选手的得分
+        mapGroup.insert(map_pair(scoreavg, *it)); //保存分组信息
+
+        if(indexTemp % 6 == 0){
+            indexGroup ++;
+            int highIndex = 0;
+            printf("第%d轮比赛第%d组比赛成绩：\n", index, indexGroup);
+            for(multimap<int, int, greater<int>>::iterator it = mapGroup.begin(); it != mapGroup.end(); it++){
+                highIndex ++;
+                if(highIndex <= 3){
+                    v2.push_back(it->second);
+                }
+                cout << "姓名:" << mapSpeaker[it->second].name << "分数:" << mapSpeaker[it->second].score[index-1] << endl;
+            }
+            mapGroup.clear();
+        }
+    }
 
 
 }
