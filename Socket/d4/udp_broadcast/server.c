@@ -28,7 +28,7 @@ int main(void)
     bind(sockfd, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
 
     int flag = 1;
-    //允许发送广播数据包SO_BROADCAST
+    //允许发送广播数据包SO_BROADCAST,让这个socket具备广播能力
     setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &flag, sizeof(flag));
 
 
@@ -40,7 +40,7 @@ int main(void)
 
     int i = 0;
     while (1) {
-        sprintf(buf, "itcast %d\n", i++);
+        sprintf(buf, ".... %d\n", i++);
         //fgets(buf, sizeof(buf), stdin);
         sendto(sockfd, buf, strlen(buf), 0, (struct sockaddr *)&clientaddr, sizeof(clientaddr));
         sleep(1);
