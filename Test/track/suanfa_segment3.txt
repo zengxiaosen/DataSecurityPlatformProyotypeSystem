@@ -615,3 +615,1401 @@ CircleListNode* CircleList_Next(CircleList* list)
 
 	return currNode;
 }
+//////////////
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <cstring.h>
+#include "circlelist.h"
+
+/**
+ * 约瑟夫问题
+ * n个人围成一个圆圈，首先第一个人从1开始一个人一个人顺时针报数
+ * 报到第m个人，令其出猎。然后再从下一个人开始从1顺时针报数，报到
+ * 第m个人，令其出列，，。。。。如此下去，求出列顺序
+ * 假设m=3 n=8 （1 2 3 4 5 6 7 8)
+ * 结果：3 6 1 5 2 8 4 7
+ **/
+
+typedef struct _Value
+{
+    //内部的链表节点
+    CircleListNode node;
+    int v; //数据
+}Value;
+
+void joseph_question(){
+    Value val[8];
+    //创建循环链表
+    CircleList *list = CircleList_Create();
+    //初始化数组
+    for(int i=0; i< 8; i++){
+        val[i].v = i+1;
+        //节点插入到链表
+        CircleList_Insert(list, &val[i].node, i);
+    }
+
+    //遍历
+    for(int i=0; i< CircleList_Length(list); ++i){
+        Value* p = (Value*)CircleList_Get(list, i);
+        printf("%d ", p->v);
+    }
+    printf("\n");
+    // 出链表操作
+    // 游标重置，指向第一个数据节点
+    printf("删除的节点的次序\n");
+    CircleList_Reset(list);
+
+    while(CircleList_Length(list)){
+        //游标后移的步长
+        for(int i=0; i < 2; i++){
+            CircleList_Next(list);
+        }
+        //获取当前游标指向的节点
+        Value* p = (Value*)CircleList_Current(list);
+        //
+        printf("%d ", p->v);
+        //删除当前节点
+        CircleList_DeleteNode(list, (CircleListNode*)p);
+    }
+    CircleList_Destroy(list);
+}
+////////////
+//双向链表操作
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <cstring.h>
+#include "circlelist.h"
+
+//自定义双向链表的数据类型
+typedef void DLinkList;
+//自定义双向链表节点数据类型
+typedef struct tag_dLinkListNode{
+    struct tag_dLinkListNode *prev;
+    struct tag_dLinkListNode *next;
+}DLinkListNode; 
+//定义管理双向链表的结构体
+typedef struct _tag_dlinklist{
+    DLinkListNode head;
+    DLinkListNode *slider;
+    int length;
+}TDLinkList;
+
+typedef struct tag_value{
+    DLinkListNode head;
+    int value;
+}Value;
+
+//创建链表
+DLinkList* DLinkList_Create(){
+     TDLinkList* dlist = (TDLinkList*)malloc(sizeof(TDLinkList));
+     if(dlist != NULL){
+         dlist->head.next = NULL;
+         dlist->slider = NULL;
+         dlist->length = 0;
+         return (DLinkList*)dlist;
+     }
+     //
+     printf("分配内存失败\n");
+     return NULL;
+}
+
+//销毁链表
+void DLinkList_Destroy(DLinkList* list){
+    //判断list是否为有效指针
+    if(list != NULL){
+        free(list);
+    }
+}
+
+//清空链表
+void DLinkList_Clear(DLinkList* list){
+    if(list != NULL){
+        TDLinkList* dlist = (TDLinkList*)list;
+        //数据重置
+        dlist->length = 0;
+        dlist->head.next = NULL;
+        dlist->slider = NULL;
+    }
+}
+
+//获取链表长度
+int DLinkList_Length(DLinkList* list){
+    if(list != NULL){
+        TDLinkList* dlist = (TDLinkList*)list;
+        return dlist->length;
+    }
+    printf("DLinkList_Length error: list指针无效\n");
+    return -1;
+}
+
+//获取第 pos个元素操作
+DLinkListNode* DLinkList_Get(DLinkList* list, int pos){
+    if(list != NULL){
+        TDLinkList* dlist = (TDLinkList*)list;
+        DLinkListNode* currNode = &dlist->head;
+        for(int i=0; i<= pos; ++i){
+            currNode = currNode->next;
+        }
+        return currNode;
+    }
+
+    printf("DLinkList_Get error: list 指针无效\n");
+    return NULL;
+}
+
+//插入元素到位置pos
+int DLinkList_Insert(DLinkList* list, DLinkListNode* node, int pos){
+    //判断list是否为有效指针
+    if(list != NULL){
+        TDLinkList* dlist = (TDLinkList*)list;
+        DLinkListNode* currNode = &dlist->head;
+        //定义辅助指针变量
+        DLinkListNode* posNode = NULL;
+        //循环查找pos-1位置元素
+        for(int i=0; i< pos; i++){
+            //判断是否有后继节点
+            if(currNode->next != NULL){
+                currNode = currNode->next;
+            }else{
+                break;
+            }
+        }
+        posNode = currNode->next;
+        //开始插入
+        node->next = posNode;
+        currNode->next = node;
+        if(posNode != NULL){
+            //当链表插入第一个元素需要特殊处理
+            posNode->prev = node;
+        }
+
+        node->prev = currNode;
+
+        if(currNode == &dlist->head){
+            //如果链表为空
+            //将第一个节点的前驱节点设为空
+            node->prev = NULL;
+            dlist->slider = node;
+        }
+        //
+        dlist->length++;
+        return 0;
+    }
+    printf("DLinkList_Insert error: list指针无效\n");
+    return -1;
+}
+
+// 删除位置pos处的元素
+DLinkListNode* DLinkList_Delete(DLinkList* list, int pos){
+    if(list != NULL && pos >= 0){
+        TDLinkList* dlist = (TDLinkList*)list;
+        DLinkListNode* currNode = &dlist->head;
+        DLinkListNode* delNode = NULL;
+        DLinkListNode* nextNode = NULL;
+        for(int i=0; i< pos; i++){
+            currNode = currNode->next;
+        }
+
+        delNode = currNode->next;
+        nextNode = delNode->next;
+
+        currNode->next = nextNode;
+        if(nextNode != NULL){
+            nextNode->prev = currNode;
+            if(currNode == &dlist->head){
+                nextNode->prev = NULL;
+            }
+        }
+        dlist->length--;
+        if(dlist->slider == delNode){
+            dlist->slider = nextNode;
+        }
+
+        return delNode;
+    }
+    printf("DLinkList_Delete error: list指针 或 pos位置无效\n");
+    return NULL;
+}
+
+DLinkListNode* DLinkList_Current(DLinkList* list){
+    if(list != NULL){
+        TDListList* dlist = (TDLinkList*)list;
+        return dlist->slider;
+    }
+
+    printf("DLinkList_Current error: list指针无效\n");
+    return NULL;
+}
+
+//将游标重置指向链表中的第一个数据元素
+DLinkListNode* DLinkList_Reset(DLinkList* list){
+    if(list != NULL){
+        TDLinkList* dlist = (TDLinkList*)list;
+        dlist->slider = dlist->head.next;
+        return dlist->slider;
+    }
+    printf("DLinkList_Reset error: list: 指针无效 \n");
+    return NULL;
+}
+
+//将游标移动指向到链表中的下一个数据元素
+DLinkListNode* DLinkList_Next(DLinkList* list){
+    if(list != NULL){
+        TDLinkList* dlist = (TDLinkList*)list;
+        DLinkListNode* currSlider = dlist->slider;
+        if(dlist->slider->next != NULL){
+            dlist->slider = dlist->slider->next;
+            return currSlider;
+        }else{
+            return NULL;
+        }
+    }
+
+    printf("DLinkList_Next error: list指针无效\n");
+    return NULL;
+}
+
+
+//
+DLinkListNode* DLinkList_Prev(DLinkList* list){
+    if(list != NULL){
+        TDLinkList* dlist = (TDLinkList*)list;
+        DLinkListNode* currSlider = dlist->slider;
+        dlist->slider = dlist->slider->prev;
+        return currSlider;
+    }
+
+    printf("DLinkList_Prev error: list 指针无效\n");
+    return NULL;
+}
+
+DLinkListNode* DLinkList_DeleteNode(DLinkList* list, DLinkListNode* node){
+    if(list != NULL){
+        int nPos = 0;
+        TDLinkList* dlist = (TDLinkList*)list;
+        for(int i=0; i< dlist->length; i++){
+            if(node == DLinkList_Get(list, i)){
+                nPos  = i;
+                break;
+            }
+        }
+
+        DLinkListNode* delNode = DLinkList_Delete(list, nPos);
+        return delNode;
+    }
+    printf("DLinkList_DeleteNode error: list or node 指针无效\n");
+    return NULL;
+}
+
+//双向链表测试程序
+void dLinkListTest(){
+    int i;
+    Value val[10];
+    DLinkList *dlist = DLinkList_Create();
+    if(dlist == NULL){
+        printf("双向链表创建失败\n");
+        return;
+    }
+    for(i=0; i< sizeof(val)/sizeof(Value); i++){
+        val[i].value = i+10;
+        //向尾部插入元素
+        DLinkList_Insert(dlist, (DLinkListNode*)&val[i], i);
+    }
+
+    //遍历双向链表
+    printf("遍历双向链表\n");
+
+    for(i=0; i < DLinkList_Length(dlist); i++){
+        Value* val = (Value*)DLinkList_Get(dlist, i);
+        printf("%d\t", val->value);
+    }
+    printf("\n");
+    DLinkList_Delete(dlist, DLinkList_Length(dlist) - 1);
+    DLinkList_Delete(dlist, 0);
+
+    printf("再次遍历双向链表\n");
+    for(int i=0; i< DLinkList_Length(dlist); ++i){
+        Value* val = (Value*)DLinkList_Get(dlist, i);
+        printf("%d\t", val->value);
+    }
+
+    printf("\n");
+    DLinkList_Reset(dlist);
+    DLinkList_Next(dlist);
+    Value* pVal = (Value*)DLinkList_Current(dlist);
+    printf("DLinkList_Next --- 打印当前节点的value值： value = %d\n", pVal->value);
+    DLinkList_Prev(dlist);
+    pVal = (Value*)DLinkList_Current(dlist);
+    DLinkList_Destroy(dlist);
+}
+
+void main(){
+    dLinkListTest();
+    return 0;
+}
+
+
+/////////////
+//栈-顺序栈
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <cstring.h>
+#include "circlelist.h"
+
+#define MAXSIZE 50
+typedef struct _SQSTACK{
+    int top;
+    unsigned int data[MAXSIZE];
+}SqStack;
+
+typedef struct stu{
+    int id;
+    int age;
+}Student;
+
+void InitStack(SqStack *S){
+    S->top = -1;
+    memset(S->data, 0, sizeof(S->data));
+}
+
+void ClearStack(SqStack *S){
+    S->top = -1;
+}
+
+int StackEmpty(SqStack S){
+    if(S.top == -1){
+        return 1;
+    }
+    return 0;
+}
+
+void GetTop(SqStack S, void **e){
+    if(S.top == -1){
+        return;
+    }
+    *e = (void*)S.data[S.top];
+}
+
+void Push(SqStack *S, void *e){
+    if(S->top == MAXSIZE -1){
+        return;
+    }
+    S->top++;
+    S->data[S->top] = (unsigned int)e;
+}
+
+void Pop(SqStack* S, void **e){
+    if(S->top == -1){
+        return;
+    }
+    *e = S->data[S->top];
+    S->top--;
+}
+
+int StackLength(SqStack S){
+    return S.top + 1;
+}
+
+int main(){
+    Student stu[10];
+    SqStack st;
+    InitStack(&st);
+    for(int i=0; i< 10; i++){
+        stu[i].id = i;
+        stu[i].age = i+20;
+        Push(&st, (void*)&stu[i]);
+    }
+    printf("stack size = %d\n", StackLength(st));
+
+    while(StackEmpty(st)!= 1){
+        Student* p;
+        GetTop(st, (void**)&p);
+        printf("stack top elem id = %d, age=%d\n", p->id, p->age);
+        Pop(&st, (void*)&p);
+        printf("Delete stack elem id = %d, age=%d\n", p->id, p->age);
+    }
+    return 0;
+}
+///////////////
+
+//就近匹配
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <iostream>
+#include <stack>
+using namespace std;
+
+bool isLeft(char c){
+    bool bl;
+    switch (c){
+        case '[':
+        case '(':
+        case '{':
+        case '<':
+            bl = true;
+        default:
+            bl = false;
+            break;
+    }
+    return bl;
+}
+
+bool isRight(char c){
+    bool bl;
+    switch (c){
+        case ']':
+        case ')':
+        case '}':
+        case '>':
+            bl = true;
+            break;
+        default:
+            bl = false;
+            break;
+    }
+    return bl;
+}
+
+
+bool match(char left, char right){
+    bool bl;
+    switch (left){
+        case '[':
+            bl = right == ']';
+            break;
+        case '(':
+            bl = right == ')';
+            break;
+        case '{':
+            bl = right == '}';
+            break;
+        case '<':
+            bl = right == '>';
+            break;
+        default:
+            bl = false;
+            break;
+    }
+    return bl;
+}
+
+
+void Jiujinpipei(const char* p){
+    int i=0;
+    stack<char> st;
+    while(p[i] != '\0'){
+        if(isLeft(p[i])){
+            st.push(p[i]);
+        }else if(isRight(p[i])){
+            if(!st.empty()){
+                char top = st.top();
+                if(!match(top, p[i])){
+                    break;
+                }
+                st.pop();
+            }else{
+                break;
+            }
+        }
+        i++;
+    }
+    if(p[i] == '\0' && st.empty()){
+        cout << "匹配成功" << endl;
+    }
+    else{
+        cout << "匹配不成功" << endl;
+    }
+}
+
+int main(){
+
+    Jiujinpipei("#include <stdio.h> int main() int a[4][4]; int (*p)[4]; p=a[0]; return 0;}");
+    return 0;
+}
+
+///////
+//中缀表达式转化为后缀表达式
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <iostream>
+#include <stack>
+using namespace std;
+//中缀表达式转为后缀表达式
+bool isNumber(char c){
+    return c >= '0' && c <= '9';
+}
+
+bool isLeft(char c){
+    return c == '(';
+}
+
+bool isRight(char c){
+    return c == ')';
+}
+
+bool isOperator(char c){
+    return c == '+' || c =='-' || c == '*' || c == '/';
+}
+
+int priority(char c){
+    int ret = 0;
+    switch(c){
+        case '+':
+        case '-':
+            ret = 1;
+            break;
+        case '*':
+        case '/':
+            ret = 2;
+            break;
+        default:
+            break;
+    }
+    return ret;
+}
+
+void Transform(const char* p){
+    int i=0;
+    stack<char> st;
+    while(p[i] != '\0'){
+        //数字
+        if(isNumber(p[i])){
+            cout << p[i];
+        }
+        //左括号 
+        else if(isLeft(p[i])){
+            st.push(p[i]);
+        }
+        //运算符
+        else if(isOperator(p[i])){
+            //优先级的比较
+            while(!st.empty() && priority(st.top()) >= priority(p[i])){
+                cout << st.top();
+                st.pop();
+            }
+
+            st.push(p[i]);
+        }
+
+        else if(isRight(p[i])){
+            //如果不是左括号，弹出并输出
+            while(!isLeft(st.top())){
+                cout << st.top();
+                st.pop();
+            }
+            st.pop();
+        }
+        i++;
+    }
+    while(!st.empty()){
+        cout << st.top();
+        st.pop();
+    }
+}
+
+
+int main(){
+    Transform("8+(3-1)*5");
+    return 0;
+}
+////////////
+//二叉树基本操作
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct _tag_BitTNode{
+    char data;
+    struct _tag_BitTNode* lChild;
+    struct _tag_BitTNode* rChild;
+}BiTNode;
+
+//先序遍历
+void xianxuBL(BiTNode* root){
+    if(root == NULL){
+        return;
+    }
+    printf("%c ", root->data);
+    xianxuBL(root->lChild);
+    xianxuBL(root->rChild);
+}
+
+//中序遍历 
+void zhongxuBL(BiTNode* root){
+    //递归结束的条件
+    if(root == NULL){
+        return;
+    }
+    zhongxuBL(root->lChild);
+    printf("%c ", root->data);
+    zhongxuBL(root->rChild);
+}
+
+//后序
+void houxuBL(BiTNode* root){
+    if(root == NULL){
+        return;
+    }
+
+    houxuBL(root->lChild);
+    houxuBL(root->rChild);
+    printf("%c ", root->data);
+}
+
+int main(){
+    //构造一颗二叉树
+    BiTNode nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG;
+    // 初始化
+    memset(&nodeA, 0, sizeof(BiTNode));
+    memset(&nodeB, 0, sizeof(BiTNode));
+    memset(&nodeC, 0, sizeof(BiTNode));
+    memset(&nodeD, 0, sizeof(BiTNode));
+    memset(&nodeE, 0, sizeof(BiTNode));
+    memset(&nodeF, 0, sizeof(BiTNode));
+    memset(&nodeG, 0, sizeof(BiTNode));
+
+    //构建树
+    nodeA.data = 'A';
+    nodeA.lChild = &nodeB;
+    nodeA.rChild = &nodeC;
+
+    nodeB.data = 'B';
+    nodeB.lChild = &nodeD;
+    nodeB.rChild = &nodeE;
+
+    nodeC.data = 'C';
+    nodeC.lChild = &nodeF;
+    nodeC.rChild = &nodeG;
+
+    nodeD.data = 'D';
+    nodeE.data = 'E';
+    nodeF.data = 'F';
+    nodeG.data = 'G';
+
+    printf("先序遍历: \n");
+    xianxuBL(&nodeA);
+
+    printf("中序遍历: \n");
+    zhongxuBL(&nodeA);
+
+    printf("后序遍历: \n");
+    houxuBL(&nodeA);
+
+    return 0;
+}
+//////////////////
+//linkqueue基本操作
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct _NODE{
+    struct _NODE* next;
+}Node;
+
+typedef struct{
+    int length;
+    Node *real;
+    Node *front;
+}LinkQueue;
+
+//业务节点
+typedef struct _tag_value{
+    //包括一个链表节点
+    Node node;
+    //数据
+    int v;
+}Value;
+
+void InitQueue(LinkQueue *Q){
+    Q->length = 0;
+    Q->real = NULL;
+    Q->front = NULL;
+}
+
+void ClearQueue(LinkQueue *Q){
+    while(Q->length){
+        Node* p;
+        DeQueue(Q, &p);
+    }
+}
+
+int QueueEmpty(LinkQueue Q){
+    if(Q.length == 0){
+        return 1;
+    }
+    return 0;
+}
+
+//链表的头部为队头， 尾部为队尾
+void GetHead(LinkQueue Q, Node** e){
+    if(Q.length == 0){
+        return;
+    }
+    *e = Q.front;
+}
+
+void EnQueue(LinkQueue *Q, Node* e){
+    if(Q->length == 0){
+        Q->real = Q->front = e;
+    }else{
+        Q->real->next = e;
+        Q->real = e;
+    }
+    Q->length++;
+}
+
+void DeQueue(LinkQueue *Q, Node** e){
+    if(Q->length == 0){
+        return;
+    }
+    *e = Q->front;
+    Q->front = Q->front->next;
+    Q->length --;
+    if(Q->length == 0){
+        Q->real = NULL;
+    }
+}
+
+int QueueLength(LinkQueue Q){
+    return Q.length;
+}
+
+int main(){
+
+    Value val[5];
+    LinkQueue q;
+    InitQueue(&q);
+    for(int i=0; i< 5; i++){
+        val[i].v = i+20;
+        EnQueue(&q, &val[i].node);
+
+    }
+    printf("Queue size=%d\n", QueueLength(q));
+    //删除全部节点
+    while(QueueEmpty(q) != 1){
+        Node* p;
+        GetHead(q, &p);
+        Value* pp = (Value*)p;
+        printf("Queue head value = %d\n", pp->v);
+        DeQueue(&q, &p);
+        pp = (Value*)p;
+        printf("Delete Queue head value = %d\n", pp->v);
+
+    }
+    return 0;
+}
+//////////////////////
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include <stack>
+using namespace std;
+typedef struct _tag_BitTNode{
+    char data;
+    struct _tag_BitTNode* lChild;
+    struct _tag_BitTNode* rChild;
+}BiTNode;
+
+//先序遍历
+void xianxuBL(BiTNode* root){
+    if(root == NULL){
+        return;
+    }
+    printf("%c ", root->data);
+    xianxuBL(root->lChild);
+    xianxuBL(root->rChild);
+}
+
+//中序遍历 
+void zhongxuBL(BiTNode* root){
+    //递归结束的条件
+    if(root == NULL){
+        return;
+    }
+    zhongxuBL(root->lChild);
+    printf("%c ", root->data);
+    zhongxuBL(root->rChild);
+}
+
+//后序
+void houxuBL(BiTNode* root){
+    if(root == NULL){
+        return;
+    }
+
+    houxuBL(root->lChild);
+    houxuBL(root->rChild);
+    printf("%c ", root->data);
+}
+
+//求叶子节点的个数
+void leafNum(BiTNode* root, int* num){
+    //递归结束的条件，空树
+    if(root == NULL) {
+        return;
+    }
+    leafNum(root->lChild, num);
+    leafNum(root->rChild, num);
+    //叶子节点
+    if(root->lChild == NULL && root->rChild == NULL){
+        (*num)++;
+    }
+
+}
+
+//求树的高度
+int treeDepth(BiTNode* root){
+    if(root == NULL){
+        return 0;
+    }
+
+    int left = treeDepth(root->lChild);
+    int right = treeDepth(root->rChild);
+    
+    int max = left > right ? left : right;
+    return max + 1;
+}
+
+//拷贝二叉树
+BiTNode* copyTree(BiTNode* root){
+    if(root == NULL){
+        return NULL;
+    }
+    BiTNode* left = copyTree(root->lChild);
+    BiTNode* right = copyTree(root->rChild);
+    BiTNode* pNew = (BiTNode*)malloc(sizeof(BiTNode));
+    pNew->lChild = left;
+    pNew->rChild = right;
+    return pNew;
+}
+
+//树的中序非递归遍历
+/*
+步骤1：
+如果节点有左子树，该节点入栈
+如果节点没有左子树，访问该节点
+步骤2：
+如果节点有右子树，重复步骤1
+如果节点没有右子树（节点访问完毕），根据栈顶指示回退，访问栈顶元素，并访问右字树，重复步骤1
+如果栈为空，表示遍历结束
+
+*/
+
+//步骤1
+BiTNode* FindLeft(BiTNode* root, stack<BiTNode*> &st){
+    if(root == NULL){
+        return NULL;
+    }
+    while(root->lChild != NULL){
+        st.push(root);
+        root = root->lChild;
+    }
+    return root;
+}
+
+void MyOrder(BiTNode* root){
+    if(root == NULL){
+        return;
+    }
+
+    stack<BiTNode*> st;
+    BiTNode* left = FindLeft(root, st);
+    while(left != NULL){
+        cout << left->data;
+        if(left->rChild){
+            left = FindLeft(left->rChild, st);
+        }else{
+            //没有右子树
+            //判断栈是否为空
+            if(!st.empty()){
+                left = st.top();
+                st.pop();
+            }else{
+                cout << "遍历结束!" << endl;
+                break;
+            }
+        }
+    }
+}
+
+//#号法创建树 -- 先序遍历的方式
+BiTNode* createTree(){
+    char c;
+    cin >> c;
+    if(c == '#') {
+        return NULL;
+    }
+
+    BiTNode* root = new BiTNode;
+    root->data = c;
+    root->lChild = createTree();
+    root->rChild = createTree();
+    return root;
+}
+
+//销毁树
+void destroyTree(BiTNode* root){
+    //后序遍历方式销毁 - 必须
+    if(root == NULL){
+        return;
+    }
+    //销毁左子树
+    destroyTree(root->lChild);
+    //销毁右子树
+    destroyTree(root->rChild);
+    cout << root->data << endl;
+    //释放根节点
+    delete root;
+}
+
+
+
+
+int main(){
+    //构造一颗二叉树
+    BiTNode nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG;
+    // 初始化
+    // memset(&nodeA, 0, sizeof(BiTNode));
+    // memset(&nodeB, 0, sizeof(BiTNode));
+    // memset(&nodeC, 0, sizeof(BiTNode));
+    // memset(&nodeD, 0, sizeof(BiTNode));
+    // memset(&nodeE, 0, sizeof(BiTNode));
+    // memset(&nodeF, 0, sizeof(BiTNode));
+    // memset(&nodeG, 0, sizeof(BiTNode));
+
+    //构建树
+    nodeA.data = 'A';
+    nodeA.lChild = &nodeB;
+    nodeA.rChild = &nodeC;
+
+    nodeB.data = 'B';
+    nodeB.lChild = &nodeD;
+    nodeB.rChild = &nodeE;
+
+    nodeC.data = 'C';
+    nodeC.lChild = &nodeF;
+    nodeC.rChild = &nodeG;
+
+    nodeD.data = 'D';
+    nodeE.data = 'E';
+    nodeF.data = 'F';
+    nodeG.data = 'G';
+
+    // printf("先序遍历: \n");
+    // xianxuBL(&nodeA);
+
+    // printf("中序遍历: \n");
+    // zhongxuBL(&nodeA);
+
+    // printf("后序遍历: \n");
+    // houxuBL(&nodeA);
+
+    printf("树的中序非递归： \n");
+    MyOrder(&nodeA);
+    cout << "#号法创建树：";
+    BiTNode* root = createTree();
+    cout << "中序遍历： ";
+    MyOrder(root);
+    cout << endl;
+    destroyTree(root);
+    
+
+    return 0;
+}
+////////////////////////////
+// 归并排序
+#include <stdio.h>
+#include <stdlib.h>
+
+//将两个有序数列 a[first...mid]和 a[mid+1...last]合并
+void mergeArray(int a[], int first, int mid, int last, int temp[]){
+    int leftStart = first; //左有序序列起点
+    int leftEnd = mid; //左有序序列终点
+    int rightStart = mid + 1; //右有序序列起点
+    int rightEnd = last; //右有序序列终点
+    int length = 0; // 两个有序序列合并之后的有序序列长度
+    int i = leftStart, j = rightStart;
+    //将两个有序序列中的元素合并到第三个有序序列中（a的左半部分和右半部分合并到temp中）
+    while(i <= leftEnd && j <= rightEnd){
+        if(a[i] <= a[j]){
+            temp[length++] = a[i++];
+        } else{
+            temp[length++] = a[j++];
+        }
+    }
+
+    while(i <= leftEnd){
+        temp[length++] = a[i++];
+    }
+
+    while(j <= rightEnd){
+        temp[length++] = a[j++];
+    }
+
+    for(i=0; i< length; i++){
+        a[leftStart + i] = temp[i];
+    }
+}
+
+//归并排序
+void mergeSort(int a[], int first, int last, int temp[]){
+    if(first < last){
+        int mid = (first + last) / 2;
+        mergeSort(a, first, mid, temp);
+        mergeSort(a, mid+1, last, temp);
+        //再将两个有序数列合并
+        mergeArray(a, first, mid, last, temp);
+    }
+}
+
+int main(){
+    int i;
+    int array[] = {12, 5, 33, 6, 10};
+    int len = sizeof(array) / sizeof(int);
+    for(int i=0; i< len; ++i){
+        printf("%d\t", array[i]);
+    }
+    printf("\n");
+    //创建适当大的临时数组
+    int *p = (int*)malloc(sizeof(int) * len);
+    if(p == NULL){
+        return;
+    }
+    mergeSort(array, 0, len-1, p);
+    free(p);
+
+    //遍历
+    printf("归并排序之后的序列： ");
+    for(i=0; i< len; ++i){
+        printf("%d\t", array[i]);
+    }
+    printf("\n");
+    return 0;
+}
+////////////////////////
+//快速排序
+#include <stdio.h>
+#include <stdlib.h>
+
+//快速排序
+void quickSort(int s[], int l, int r){
+    if(l < r){
+        int i = l, j = r;
+        //拿出第一个元素，保存到x中，第一个位置作为第一个坑
+        int x = s[l];
+        while(i < j){
+            while(i < j && s[j] >= x){
+                j--;
+            }
+            if(i < j){
+                s[i++] = s[j];
+            }
+
+            while(i < j && s[i] < x){
+                i++;
+            }
+
+            if(i < j){
+                s[j--] = s[i];
+            }
+
+
+        }
+
+
+        s[i] = x;
+        quickSort(s, 1, i - 1);
+        quickSort(s, i+1, r);
+    }
+}
+
+void main(){
+    int i;
+    int array[] = {12, 5, 33, 6, 10};
+    int len = sizeof(array) / sizeof(int);
+    //遍历
+    printf("待排序数组序列： ");
+    for(i=0; i< len; i++){
+        printf("%d\t", array[i]);
+    }
+    printf("\n");
+
+    //排序
+    quickSort(array, 0, len-1);
+
+    for(i=0; i< len; ++i){
+        printf("%d\t", array[i]);
+    }
+    printf("\n");
+    return 0;
+}
+///////
+//SqList相关操作
+#include <iostream>
+#include <string.h>
+using namespace std;
+template <typename T>
+class SqList{
+    public:
+        SqList(int capacity);
+        ~SqList();
+
+        //指定位置插入数据
+        void insert(int pos, T &data);
+        T del(int pos);
+        T get(int pos);
+        void clear();
+        int length();
+    private:
+        T *m_array; //数组
+        int m_length;
+        int m_capacity;
+};
+
+template <typename T>
+SqList<T>::SqList(int capacity){
+    //动态创建数组
+    m_array =  new T[capacity];
+    m_length = 0;
+    m_capacity = capacity;
+    cout << "SqList 构造完成！" << endl;
+}
+
+template <typename T>
+SqList<T>::~SqList(){
+    //释放内存
+    delete []m_array;
+    cout << "SqList 析构完成!" << endl;
+}
+
+template <typename T>
+void SqList<T>::insert(int pos, T &data){
+    if(pos < 0 || pos > m_length){
+        return;
+    }
+    if(m_length >= m_capacity){
+        return;
+    }
+
+    //从length - 1 到pos依次后移
+    for(int i = m_length - 1; i>= pos; --i){
+        m_array[i+1] = m_array[i];
+    }
+    m_array[pos] = data;
+    m_length++;
+}
+
+template <typename T>
+T SqList<T>::del(int pos){
+    T t = m_array[pos];
+    for(int i = pos+1; i< m_length; ++i){
+        m_array[i-1] = m_array[i];
+
+    }
+    m_length--;
+    return t;
+}
+
+template <typename T>
+T SqList<T>::get(int pos){
+    T t = m_array[pos];
+    return t;
+}
+
+
+
+template <typename T>
+void SqList<T>::clear(){
+    m_length = 0;
+}
+
+template <typename T>
+int SqList<T>::length(){
+    return m_length;
+}
+
+
+void SeqListTest(){
+    SqList<string> list(30);
+    string array[] = {
+        "111",
+        "222",
+        "333",
+        "444",
+        "555",
+        "666",
+        "777",
+        "888",
+        "999",
+        "101010"
+    };
+    for(int i=0; i< 10; i++){
+        list.insert(i, array[i]);
+    }
+
+    for(int i=0; i< list.length(); i++){
+        string tmp = list.get(i);
+        cout << tmp.data() << endl;
+    }
+
+    while(list.length() > 0){
+        string tmp = list.del(0);
+        cout << "delete -- " << tmp.data() << endl;
+    }
+}
+
+int main(){
+
+    SeqListTest();
+
+    return 0;
+}
+
+/////////////////////
+//LinkList测试
+#include <iostream>
+#include <string.h>
+using namespace std;
+template <typename T>
+struct ListNode{
+    T data;
+    ListNode *next;
+};
+
+template <typename T>
+class LinkList{
+public:
+    LinkList();
+    ~LinkList();
+
+    void insert(int pos, T &data);
+    T del(int pos);
+    T get(int pos);
+    void clear();
+    int length();
+
+private:
+    ListNode<T> *m_head;
+    int m_length;
+
+};
+
+struct Student{
+    int age;
+    string name;
+};
+
+
+template <typename T>
+LinkList<T>::LinkList(){
+    m_head = new ListNode<T>;
+    m_head->next = NULL;
+    m_length = 0;
+    cout << "LinkList 构造完成！" << endl;
+}
+
+template <typename T>
+LinkList<T>::~LinkList(){
+    clear();
+    //释放头节点
+    delete m_head;
+    cout << "LinkList 析构完毕！" << endl;
+}
+
+template <typename T>
+void LinkList<T>::insert(int pos, T &data){
+    if(pos < 0 || pos > m_length){
+        return;
+    }
+    ListNode<T>* pCur = m_head;
+    for(int i=0; i< pos; ++i){
+        pCur = pCur->next;
+    }
+    ListNode<T>* pnew = new ListNode<T>;
+    pnew->data = data;
+    pnew->next = pCur->next;
+    pCur->next = pnew;
+    m_length++;
+}
+
+template <typename T>
+T LinkList<T>::del(int pos){
+    //辅助指针
+    ListNode<T>* pCur = m_head;
+    for(int i=0; i< pos; ++i){
+        pCur = pCur->next;
+    }
+    ListNode<T>* pDel = pCur->next;
+    T t = pDel->data;
+    pCur->next = pDel->next;
+    //释放内存
+    delete pDel;
+    m_length--;
+    return t;
+}
+
+template <typename T>
+T LinkList<T>::get(int pos){
+    ListNode<T>* pCur = m_head;
+    for(int i=0; i<= pos; ++i){
+        pCur= pCur->next;
+    }
+    return pCur->data;
+}
+
+template <typename T>
+void LinkList<T>::clear(){
+    while(m_length){
+        del(0);
+    }
+}
+
+template <typename T>
+int LinkList<T>::length(){
+    return m_length;
+}
+
+
+
+
+
+
+void LinkListTest(){
+    //创建对象
+    LinkList<Student> list;
+    Student stu[10];
+    //初始化
+    for(int i=0; i< 10; i++){
+        stu[i].age = i + 20;
+        stu[i].name = "Student";
+        list.insert(i, stu[i]);
+    }
+
+    for(int i=0; i< list.length(); i++){
+        Student s = list.get(i);
+        cout << "student age : " << s.age << endl;
+    }
+
+    //删除所有节点
+    while(list.length() > 0){
+        Student s = list.del(0);
+        cout << "delete --- Student age: " << s.age << endl;
+    }
+
+}
+
+int main(){
+
+    LinkListTest();
+    cout << "Keyboard not found , pree F1 to continue..." << endl;
+    return 0;
+}
+
+//////////////////////////
