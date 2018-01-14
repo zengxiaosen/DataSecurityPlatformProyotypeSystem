@@ -2013,3 +2013,188 @@ int main(){
 }
 
 //////////////////////////
+//SqStack操作
+#include <iostream>
+#include <string.h>
+using namespace std;
+template <typename T>
+class SqStack{
+    public:
+        SqStack(int capacity);
+        ~SqStack();
+        void push(T &data);
+        void pop();
+        T top();
+        int size();
+    private:
+        //指针
+        T *m_array;
+        int m_top;
+        int m_capacity;
+};
+
+template <typename T>
+T SqStack<T>::top(){
+    return m_array[m_top];
+}
+
+template <typename T>
+int SqStack<T>::size(){
+    return m_top+1;
+}
+
+template <typename T>
+void SqStack<T>::pop(){
+    if(m_top == -1){
+        return;
+    }
+    m_top--;
+}
+
+template <typename T>
+void SqStack<T>::push(T &data){
+    if(m_top == m_capacity-1){
+        return;
+    }
+    m_top++;
+    m_array[m_top] = data;
+}
+
+template <typename T>
+SqStack<T>::~SqStack(){
+    //释放内存
+    delete []m_array;
+}
+
+template <typename T>
+SqStack<T>::SqStack(int capacity){
+    m_array = new T[capacity];
+    m_top  = -1;
+    m_capacity = capacity;
+}
+
+void test(){
+    SqStack<int> st(30);
+    int tmp;
+    for(int i=0; i< 10; i++){
+        tmp = i+10;
+        st.push(tmp);
+        cout << "push element! " << tmp << endl;
+    }
+
+    cout << "stack size= " << st.size() << endl;
+
+    while(st.size() > 0){
+        int t = st.top();
+        cout << "stack top element " << t << endl;
+        st.pop();
+    }
+}
+
+int main(){
+    test();
+    cout << "Keyboard not found, press F1 to continue ..." << endl;
+    return 0;
+}
+
+
+//////////////////
+//linkstack相关操作
+#include <iostream>
+#include <string.h>
+using namespace std;
+template <typename T>
+struct StackNode{
+    T data;
+    StackNode* next;
+};
+
+template <typename T>
+class LinkStack{
+    public:
+        LinkStack();
+        ~LinkStack();
+
+        void push(T &data);
+        void pop();
+        T top();
+        int size();
+    private:
+        //指向栈顶 - 链表的头部做栈顶
+        StackNode<T> *m_top;
+        int m_length;
+};
+
+
+template <typename T>
+int LinkStack<T>::size(){
+    return m_length;
+}
+
+template <typename T>
+T LinkStack<T>::top(){
+    return m_top->data;
+}
+
+template <typename T>
+void LinkStack<T>::pop(){
+    if(m_length == 0){
+        return;
+    }
+    StackNode<T>* pDel = m_top;
+    m_top = m_top->next;
+    delete pDel;
+    m_length--;
+}
+
+template <typename T>
+void LinkStack<T>::push(T &data){
+    //创建节点
+    StackNode<T>* pNew = new StackNode<T>;
+    pNew->data = data;
+    pNew->next = NULL;
+
+    pNew->next = m_top;
+    m_top = pNew;
+    m_length++;
+}
+
+template <typename T>
+LinkStack<T>::~LinkStack(){
+    while(m_length){
+        pop();
+    }
+}
+
+template <typename T>
+LinkStack<T>::LinkStack(){
+    m_length = 0;
+    m_top = NULL;
+}
+
+void Mytest(){
+    LinkStack<int> list;
+    int array[10];
+
+    for(int i=0; i< 10; i++){
+        array[i] = i+10;
+        list.push(array[i]);
+        cout << "push element : " << array[i] << endl;
+    }
+
+    while(list.size() > 0){
+        int t = list.top();
+        cout << "stack top element: " << t << endl;
+        list.pop();
+    }
+}
+
+
+int main(){
+    Mytest();
+    cout << "Keyboard not found, press F1 to continue...." <<endl;
+    return 0;
+}
+
+
+///////////////////////////
